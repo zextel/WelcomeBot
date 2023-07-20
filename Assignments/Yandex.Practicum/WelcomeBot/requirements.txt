@@ -1,0 +1,7 @@
+aiohttp
+freeGPT
+numpy
+soundfile
+python-telegram-bot
+pyttsx3
+SpeechRecognition
