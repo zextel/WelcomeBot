@@ -49,7 +49,6 @@ class WelcomeBot:
             case "PHOTO_2":
                 await context.bot.send_chat_action(chat_id=query.message.chat_id,
                                                    action=constants.ChatAction.UPLOAD_PHOTO)
-
                 await query.message.reply_photo(
                     photo=os.getcwd() + "//data//images//school.jpg",
                     caption=const_text.CMD_PHOTO_SCHOOL_DESC,
@@ -81,10 +80,12 @@ class WelcomeBot:
             case "BACK":
                 await query.message.reply_text(text=const_text.CMD_BACK_TEXT, reply_markup=components.MENU_START_KB)
 
+            # Отправляем пользователя на start, "just in case"
             case _:
-                pass
+                await query.message.reply_text(text=const_text.REPLY_ERROR_RETRY, reply_markup=components.MENU_START_KB)
 
     async def handle_voice_message(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        # Для голосовых - добавляем acton'ы. Пока распознается текст - "печатает..."
         await context.bot.send_chat_action(chat_id=update.message.chat_id,
                                            action=constants.ChatAction.TYPING)
         # Получаем объект аудио и скачиваем аудиофайл
@@ -103,7 +104,7 @@ class WelcomeBot:
         with sr.AudioFile(wav_path) as source:
             audio = self.r.record(source)
         try:
-
+            # Для голосовых - добавляем acton'ы. Пока распознается текст - "печатает..."
             await context.bot.send_chat_action(chat_id=update.message.chat_id,
                                                action=constants.ChatAction.TYPING)
             # Распознаем речь с помощью Google Speech Recognition
@@ -117,6 +118,7 @@ class WelcomeBot:
             # Используем бесплатную LLM из библиотеки freeGPT для генерации ответа
             resp = await getattr(freeGPT, "gpt3").Completion.create(text)
 
+            # Текст распознался - теперь "записывает голосовое сообщение"
             await context.bot.send_chat_action(chat_id=update.message.chat_id,
                                                action=constants.ChatAction.RECORD_VOICE)
             # Генерируем голосовой ответ
@@ -128,18 +130,19 @@ class WelcomeBot:
             await context.bot.send_chat_action(chat_id=update.message.chat_id,
                                                action=constants.ChatAction.UPLOAD_VOICE)
             await update.message.reply_voice(voice=open('response_voice_message.ogg', 'rb'),
-                                             reply_to_message_id = update.message.message_id)
+                                             reply_to_message_id=update.message.message_id)
             os.remove(os.getcwd() + '\\response_voice_message.ogg')
 
-        except sr.UnknownValueError:
+        except sr.UnknownValueError:  # ошибка библиотеки распознавания
             await update.message.reply_text("Не удалось распознать речь")
-        except sr.RequestError as e:
+        except sr.RequestError as e: # ошибка библиотеки распознавания
             await update.message.reply_text("Ошибка сервиса распознавания речи: {0}".format(e))
             os.remove(oga_path)
             os.remove(wav_path)
-        except freeGPT.gpt3.exceptions.RequestException as e:
+        except freeGPT.gpt3.exceptions.RequestException as e: # ошибка gpt-библиотеки
             await update.message.reply_text("Сетевая ошибка : {0}".format(e))
         try:
+            # Чистим за собой файлы
             os.remove(oga_path)
             os.remove(wav_path)
         except OSError:
@@ -167,6 +170,7 @@ class WelcomeBot:
                     text=const_text.REPLY_VOICE,
                     reply_markup=components.BACK_TO_MENU
                 )
+            # Если пользователь отправил текст - вернем его на start
             case _:
                 await update.message.reply_text(const_text.REPLY_ERROR_RETRY)
 
