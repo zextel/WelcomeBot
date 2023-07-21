@@ -42,7 +42,7 @@ class WelcomeBot:
                 await context.bot.send_chat_action(chat_id=query.message.chat_id,
                                                    action=constants.ChatAction.UPLOAD_PHOTO)
                 await query.message.reply_photo(
-                    photo=os.getcwd() + "\\data\\images\\selfie.png",
+                    photo=os.getcwd() + "//data//images//selfie.png",
                     caption=const_text.CMD_PHOTO_SELFIE_DESC,
                     reply_markup=components.MENU_PHOTO_KB)
                 await query.delete_message()
@@ -94,7 +94,7 @@ class WelcomeBot:
         path = await new_file.download_to_drive()
 
         # Формируем пути для корректной работы методов из библиотеки soundfile
-        oga_path = os.getcwd() + "\\" + str(path)
+        oga_path = os.getcwd() + "//" + str(path)
         wav_path = oga_path.replace(".oga", ".wav")
 
         # Конвертируем из oga (ogg) в wav, т.к. SpeechRecognition не умеет читать ogg
@@ -131,7 +131,7 @@ class WelcomeBot:
                                                action=constants.ChatAction.UPLOAD_VOICE)
             await update.message.reply_voice(voice=open('response_voice_message.ogg', 'rb'),
                                              reply_to_message_id=update.message.message_id)
-            os.remove(os.getcwd() + '\\response_voice_message.ogg')
+            os.remove(os.getcwd() + '//response_voice_message.ogg')
 
         except sr.UnknownValueError:  # ошибка библиотеки распознавания
             await update.message.reply_text("Не удалось распознать речь")
