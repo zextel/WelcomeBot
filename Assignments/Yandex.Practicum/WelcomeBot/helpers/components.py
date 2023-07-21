@@ -17,7 +17,7 @@ MENU_PHOTO_KB = InlineKeyboardMarkup(
      [InlineKeyboardButton(constants.CMD_BACK, callback_data="BACK")]]
 )
 
-MENU_VOICES_KB = InlineKeyboardMarkup(
+MENU_VOICE_KB = InlineKeyboardMarkup(
     [[InlineKeyboardButton(constants.CMD_VOICE_GRAND_GPT, callback_data="VOICE_1")],
      [InlineKeyboardButton(constants.CMD_VOICE_SQL_NOSQL, callback_data="VOICE_2")],
      [InlineKeyboardButton(constants.CMD_VOICE_HEARTBREAK, callback_data="VOICE_3")],

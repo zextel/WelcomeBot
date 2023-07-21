@@ -28,10 +28,10 @@ class WelcomeBot:
         )
 
     async def handle_nextstep_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        await update.message.reply_text(const_text.CMD_NEXT_STEP_TEXT)
+        await update.message.reply_text(const_text.REPLY_NEXT_STEP_TEXT)
 
     async def handle_github_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        await update.message.reply_text(const_text.CMD_GITHUB_TEXT + const_text.GITHUB_LINK)
+        await update.message.reply_text(const_text.REPLY_GITHUB_TEXT + const_text.GITHUB_LINK)
 
     async def menu_callback(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         query = update.callback_query
@@ -42,32 +42,51 @@ class WelcomeBot:
                 await context.bot.send_chat_action(chat_id=query.message.chat_id,
                                                    action=constants.ChatAction.UPLOAD_PHOTO)
                 await query.message.reply_photo(
-                    photo=os.getcwd() + "//data//images//selfie.png",
+                    photo=os.getcwd() + "\\data\\images\\selfie.png",
                     caption=const_text.CMD_PHOTO_SELFIE_DESC,
                     reply_markup=components.MENU_PHOTO_KB)
+                await query.delete_message()
             case "PHOTO_2":
                 await context.bot.send_chat_action(chat_id=query.message.chat_id,
                                                    action=constants.ChatAction.UPLOAD_PHOTO)
+
                 await query.message.reply_photo(
                     photo=os.getcwd() + "//data//images//school.jpg",
                     caption=const_text.CMD_PHOTO_SCHOOL_DESC,
                     reply_markup=components.MENU_PHOTO_KB)
-            case "PHOTO_BACK":
-                await query.message.reply_text(text="\start")
+                await query.delete_message()
 
             case "VOICE_1":
-                await query.message.reply_text(text=f"Selected option: {query.data}")
+                await context.bot.send_chat_action(chat_id=query.message.chat_id,
+                                                   action=constants.ChatAction.RECORD_VOICE)
+                await query.message.reply_voice(voice=open(os.getcwd() + "//data//voices//grandgpt.m4a", 'rb'),
+                                                caption=const_text.CMD_VOICE_GRAND_GPT,
+                                                reply_markup=components.MENU_VOICE_KB)
+                await query.delete_message()
             case "VOICE_2":
-                await query.message.reply_text(text=f"Selected option: {query.data}")
+                await context.bot.send_chat_action(chat_id=query.message.chat_id,
+                                                   action=constants.ChatAction.RECORD_VOICE)
+                await query.message.reply_voice(voice=open(os.getcwd() + "//data//voices//sql_nosql.m4a", 'rb'),
+                                                caption=const_text.CMD_VOICE_SQL_NOSQL,
+                                                reply_markup=components.MENU_VOICE_KB)
+                await query.delete_message()
             case "VOICE_3":
-                await query.message.reply_text(text=f"Selected option: {query.data}")
-            case "VOICE_BACK":
-                await query.message.reply_text(text=f"Selected option: {query.data}")
+                await context.bot.send_chat_action(chat_id=query.message.chat_id,
+                                                   action=constants.ChatAction.RECORD_VOICE)
+                await query.message.reply_voice(voice=open(os.getcwd() + "//data//voices//heartbreak.m4a", 'rb'),
+                                                caption=const_text.CMD_VOICE_HEARTBREAK,
+                                                reply_markup=components.MENU_VOICE_KB)
+                await query.delete_message()
+
+            case "BACK":
+                await query.message.reply_text(text=const_text.CMD_BACK_TEXT, reply_markup=components.MENU_START_KB)
 
             case _:
                 pass
 
     async def handle_voice_message(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await context.bot.send_chat_action(chat_id=update.message.chat_id,
+                                           action=constants.ChatAction.TYPING)
         # Получаем объект аудио и скачиваем аудиофайл
         file_id = update.message.voice.file_id
         new_file = await context.bot.get_file(file_id)
@@ -84,6 +103,9 @@ class WelcomeBot:
         with sr.AudioFile(wav_path) as source:
             audio = self.r.record(source)
         try:
+
+            await context.bot.send_chat_action(chat_id=update.message.chat_id,
+                                               action=constants.ChatAction.TYPING)
             # Распознаем речь с помощью Google Speech Recognition
             text = self.r.recognize_google(audio, language="ru-RU")
 
@@ -105,7 +127,8 @@ class WelcomeBot:
             # Отправляем голосовой ответ пользователю
             await context.bot.send_chat_action(chat_id=update.message.chat_id,
                                                action=constants.ChatAction.UPLOAD_VOICE)
-            await update.message.reply_voice(voice=open('response_voice_message.ogg', 'rb'))
+            await update.message.reply_voice(voice=open('response_voice_message.ogg', 'rb'),
+                                             reply_to_message_id = update.message.message_id)
             os.remove(os.getcwd() + '\\response_voice_message.ogg')
 
         except sr.UnknownValueError:
@@ -131,17 +154,17 @@ class WelcomeBot:
                 )
             case const_text.CMD_START_MENU_STORY:
                 await update.message.reply_text(
-                    text=const_text.CMD_STORY_FULL,
+                    text=const_text.REPLY_STORY_FULL,
                     reply_markup=components.BACK_TO_MENU
                 )
             case const_text.CMD_START_MENU_VOICE:
                 await update.message.reply_text(
                     text=const_text.CMD_VOICE_DESCRIPTION,
-                    reply_markup=components.MENU_VOICES_KB
+                    reply_markup=components.MENU_VOICE_KB
                 )
             case const_text.CMD_START_MENU_VCHAT:
                 await update.message.reply_text(
-                    text=const_text.CMD_START_MENU_VCHAT_FULL,
+                    text=const_text.REPLY_VOICE,
                     reply_markup=components.BACK_TO_MENU
                 )
             case _:
