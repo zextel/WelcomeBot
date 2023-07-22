@@ -112,7 +112,7 @@ class WelcomeBot:
 
             # Если повезёт, то пользователю отправится шутка, шутки ради :)
             if random.choice(range(10)) % 10 == 0:
-                joke = random.sample(const_text.REPLY_VOICE_JOKES).replace("@s", text)
+                joke = random.choice(const_text.REPLY_VOICE_JOKES).replace("@s", text)
                 await update.message.reply_text(joke)
 
             # Используем бесплатную LLM из библиотеки freeGPT для генерации ответа
